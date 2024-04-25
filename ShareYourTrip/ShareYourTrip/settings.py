@@ -35,7 +35,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'App.apps.AppConfig',
+    'Blog.apps.AppConfig',
+    'ckeditor',
+    'ckeditor_uploader',
+    'rest_framework',
+    'drf_yasg',
+    'oauth2_provider',
 ]
 
 import cloudinary
@@ -45,6 +50,12 @@ cloudinary.config(
     api_key="446637785899928",
     api_secret="7EAQ1bjCVEaO2tYArfZbYo58tXo"
 )
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+      )
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -82,6 +93,8 @@ WSGI_APPLICATION = 'ShareYourTrip.wsgi.application'
 import pymysql
 
 pymysql.install_as_MySQLdb()
+
+CKEDITOR_UPLOAD_PATH = "ckeditors/images/"
 
 DATABASES = {
     'default': {
@@ -132,4 +145,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'App.User'
+AUTH_USER_MODEL = 'Blog.User'
+
+CLIENT_ID = 'zA8iFkaeejABLUaSQ2bxytWde6Pn2HGBEgAy7bOY'
+CLIENT_SECRET = 'vyQ5EN0XolrR0yi551eykdRSga6oj1JUsAM8QtHbFcEF97r4lCbTnt9f9vC0HpBdOhONzS2qSdzqNCHAvUzKlNcB3jWeU1Id42CbgFe0mzh880C8lljUNFGT8WjjTVvU'

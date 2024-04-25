@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from cloudinary.models import CloudinaryField
+from ckeditor.fields import RichTextField
 
 
 class User(AbstractUser):
@@ -18,18 +19,13 @@ class User(AbstractUser):
     def increase_report_count(self):
         self.report_count += 1
 
-    def __str__(self):
-        return self.last_name + " " + self.first_name
-
 
 class BaseModel(models.Model):
-
     class Meta:
         abstract = True
 
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    description = models.TextField(max_length=255, null=True, blank=True)
 
 
 class Post(BaseModel):
@@ -41,9 +37,9 @@ class Post(BaseModel):
     end_point = models.TextField(max_length=255, null=False, blank=False)
     status = models.BooleanField(default=True)
     active = models.BooleanField(default=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    images = models.ManyToManyField('Image')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     hashtags = models.ManyToManyField('Hashtag')
+    description = RichTextField()
 
     def __str__(self):
         return self.title
@@ -51,9 +47,10 @@ class Post(BaseModel):
 
 class Image(models.Model):
     image = CloudinaryField()
+    post = models.ForeignKey(Post, related_name='images', on_delete=models.CASCADE)
 
 
-class Hashtag(models.Model):
+class Hashtag(BaseModel):
     hashtag = models.CharField(max_length=255, blank=True, null=False, unique=True)
 
     def __str__(self):
@@ -61,7 +58,6 @@ class Hashtag(models.Model):
 
 
 class Interaction(models.Model):
-
     class Meta:
         abstract = True
 
@@ -70,12 +66,12 @@ class Interaction(models.Model):
 
 
 class Comment(Interaction):
-    content = models.TextField(max_length=255)
-    confirmed = models.BooleanField(default=None)
+    content = models.TextField(max_length=1000)
+    confirmed = models.BooleanField(default=False)
 
 
-class Rating(models.Model):
-    stars = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+class Rating(Interaction):
+    stars = models.IntegerField(choices=[(i, i) for i in range(0, 5)])
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
@@ -89,11 +85,14 @@ class Group(models.Model):
     members = models.ManyToManyField(User, related_name='members')
 
     def __str__(self):
-        return "Group " + self.post.name
+        return "Admin of Group: " + self.post.name
 
 
 class Report(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=False)
-    content = models.TextField(max_length=255, null=False)
+    content = models.TextField(max_length=1000)
     reported_user = models.ForeignKey(User, related_name='reported_user', on_delete=models.CASCADE)
-    reporting_user = models.ForeignKey(User, related_name='reported_made', on_delete=models.CASCADE)
+    reporter = models.ForeignKey(User, related_name='reporter', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('reporter', 'reported_user')
