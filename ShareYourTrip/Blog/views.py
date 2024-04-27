@@ -9,6 +9,7 @@ from Blog import serializers, paginators
 # /posts/
 # /posts/?q=
 # /posts/{id}/
+# /post/{id}/comments/ (post)
 class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = Post.objects.filter(active=True)
     serializer_class = serializers.PostSerializer
@@ -17,7 +18,6 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
         if hasattr(self, 'kwargs') and 'pk' in self.kwargs:
             # Nếu yêu cầu chứa một định danh duy nhất của đối tượng,
             # chẳng hạn như yêu cầu chi tiết (/posts/{pk}/), sử dụng PostDetailSerializer
-            print('here')
             return serializers.PostDetailSerializer
         else:
             return self.serializer_class
@@ -37,30 +37,37 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
             query_set = Post.objects.prefetch_related('hashtags', 'user').filter(active=True)
         return query_set
     
-    @action(methods=['get'], url_path='comments', detail=True)
-    def get_comment(self, request, pk):
-        """
-        queryset = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        """
-        comments = self.get_object().comment_set.select_related('user').order_by('-id')
-        paginator = paginators.CommentPaginator()
-        page = paginator.paginate_queryset(comments, request)
-        if page is not None:
-            serializer = serializers.CommentSerializer(page, many=True)
-            return paginator.get_paginated_response(serializer.data)
+    # @action(methods=['get'], url_path='comments', detail=True)
+    # def get_comment(self, request, pk):
+    #     print('get comment function')
+    #     comments = self.get_object().comment_set.order_by('-id')
+    #     paginator = paginators.CommentPaginator()
+    #     page = paginator.paginate_queryset(comments, request)
+    #     if page is not None:
+    #         serializer = serializers.CommentSerializer(page, many=True)
+    #         return paginator.get_paginated_response(serializer.data)
         
-        return Response(serializers.CommentSerializer(comments, many=True).data, status=status.HTTP_200_OK)
+    #     return Response(serializers.CommentSerializer(comments, many=True).data, status=status.HTTP_200_OK)
 
+    # @action(methods=['post'], url_path='comments', detail=True)
+    # def add_comment(self, request, pk):
+    #     c = self.get_object().comment_set.create(user=request.user, content=request.data.get('content'))
+    #     return Response(serializers.CommentSerializer(c).data, status=status.HTTP_201_CREATED)
 
-    @action(methods=['post'], url_path='comments', detail=True)
-    def add_comment(self, request, pk):
-        c = self.get_object().comment_set.create(user=request.user, content=request.data.get('content'))
-        return Response(serializers.CommentSerializer(c).data, status=status.HTTP_201_CREATED)
+    @action(methods=['get', 'post'], url_path='comments', detail=True)
+    def comment_handle(self, request, pk):
+        if request.method.__eq__('POST'):
+            c = self.get_object().comment_set.create(user=request.user, content=request.data.get('content'))
+            return Response(serializers.CommentSerializer(c).data, status=status.HTTP_201_CREATED)
+        elif request.method.__eq__('GET'):
+            comments = self.get_object().comment_set.order_by('-id')
+            paginator = paginators.CommentPaginator()
+            page = paginator.paginate_queryset(comments, request)
+            if page is not None:
+                serializer = serializers.CommentSerializer(page, many=True)
+                return paginator.get_paginated_response(serializer.data)
+            
+            return Response(serializers.CommentSerializer(comments, many=True).data, status=status.HTTP_200_OK)
 
 
 # /hashtags/
