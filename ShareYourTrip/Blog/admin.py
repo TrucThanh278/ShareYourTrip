@@ -1,5 +1,5 @@
 from django.contrib import admin
-from Blog.models import Post, Hashtag, Comment, Report, Group, Image, User, Rating
+from Blog.models import Post, Hashtag, Comment, Report, Group, Image, User, Rating, Follow
 from django.utils.html import mark_safe
 from django import forms
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
@@ -32,3 +32,4 @@ admin.site.register(Report)
 admin.site.register(Image)
 admin.site.register(User)
 admin.site.register(Group)
+admin.site.register(Follow)

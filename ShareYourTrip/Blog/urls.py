@@ -9,5 +9,5 @@ r.register('users', views.UserViewSet, 'users')
 r.register('comments', views.CommentViewSet, 'comments')
 
 urlpatterns = [
-    path('', include(r.urls))
+    path('', include(r.urls)),
 ]

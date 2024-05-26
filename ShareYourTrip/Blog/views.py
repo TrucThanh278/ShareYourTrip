@@ -3,9 +3,16 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import viewsets, generics, parsers, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from Blog.models import Post, Hashtag, Comment, Rating, User, Like, Follow
+from Blog import serializers, paginators, perms
+from Blog.perms import IsAdmin, IsUser
+from django.contrib.auth.models import Group
+from django.http import JsonResponse
+from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
-from Blog.models import Post, Hashtag, Comment, Rating, User
-from Blog import serializers, paginators
+
+
 
 # /posts/
 # /posts/?q=
@@ -25,13 +32,14 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
         else:
             return self.serializer_class
 
+
     def get_queryset(self):
         query_set = self.queryset
-        if self.action.__eq__('list'):
+        if self.action == 'list':
             q = self.request.query_params.get('q')
             if q:
                 query_set = query_set.filter(Q(title__icontains=q) | Q(description__icontains=q))
-        if self.action.__eq__('retrieve'):
+        if self.action == 'retrieve':
             query_set = Post.objects.prefetch_related('hashtags', 'user').filter(active=True)
         return query_set
 
@@ -49,14 +57,13 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
             if page is not None:
                 serializer = serializers.CommentSerializer(page, many=True)
                 return paginator.get_paginated_response(serializer.data)
-            
+
             return Response(serializers.CommentSerializer(comments, many=True).data, status=status.HTTP_200_OK)
         
     @action(methods=['get'], url_path='images', detail=True)
     def images_handle(self, request, pk):
             images = self.get_object().images.order_by('-id')
             return Response(serializers.ImageSerializer(images, many=True).data, status=status.HTTP_200_OK)
-        
 
 # /hashtags/
 # /hashtags/?q=
@@ -66,16 +73,13 @@ class HashtagViewSet(viewsets.ViewSet, generics.ListAPIView):
 
     def get_queryset(self):
         query_set = self.queryset
-        if self.action.__eq__('list'):
+        if self.action == 'list':
             q = self.request.query_params.get('q')
             if q:
                 query_set = query_set.filter(hashtag__icontains=q)
-
         return query_set
 
-# /users/: create user
-# /users/current-user/: (get)
-# /users/current-user/: (patch)
+
 class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.RetrieveAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = serializers.UserSerializer
