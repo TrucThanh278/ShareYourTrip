@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-&af+c18skp3-2tqa_3qhd5k!&byv4+yv&$i^33!+ro8nb02qce
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -46,9 +46,9 @@ INSTALLED_APPS = [
 import cloudinary
 
 cloudinary.config(
-    cloud_name="djyggobeq",
-    api_key="446637785899928",
-    api_secret="7EAQ1bjCVEaO2tYArfZbYo58tXo"
+    cloud_name="dsvodlq5d",
+    api_key="325257939927122",
+    api_secret="hFaOAX00E9c-TzAH66vU80htg1w"
 )
 
 REST_FRAMEWORK = {
@@ -99,9 +99,9 @@ CKEDITOR_UPLOAD_PATH = "ckeditors/images/"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'shareyourtrip',
+        'NAME': 'new_schema',
         'USER': 'root',
-        'PASSWORD': 'ThanhTruc2708',
+        'PASSWORD': 'Vu0932868903',
         'HOST': ''  # mặc định localhost
     }
 }
@@ -147,5 +147,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'Blog.User'
 
-CLIENT_ID = 'zA8iFkaeejABLUaSQ2bxytWde6Pn2HGBEgAy7bOY'
-CLIENT_SECRET = 'vyQ5EN0XolrR0yi551eykdRSga6oj1JUsAM8QtHbFcEF97r4lCbTnt9f9vC0HpBdOhONzS2qSdzqNCHAvUzKlNcB3jWeU1Id42CbgFe0mzh880C8lljUNFGT8WjjTVvU'
+CLIENT_ID = 'dfh7uWp5VKdf4q18a8jLtLTHZAfGhasLBb6mN9Qe'
+CLIENT_SECRET = 'Dkagq9SorkT1pG3VNL42GxAKpLRTsLS1x9gmmlranSlv58h5XdsPhJRUyYHQfDndZplRdzxqEzFuADV497hQvVPUpBczcsHgjIExow2ho1yz3IIE4HgIbuLBVO2P3xgX'
