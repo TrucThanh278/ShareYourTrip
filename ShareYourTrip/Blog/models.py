@@ -83,7 +83,6 @@ class Post(BaseModel):
 
 class Image(models.Model):
     image = CloudinaryField()
-    name = models.CharField(max_length=255, null=True, blank=True)
     post = models.ForeignKey(Post, related_name='images', on_delete=models.CASCADE)
 
 
