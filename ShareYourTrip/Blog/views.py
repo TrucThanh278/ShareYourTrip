@@ -3,6 +3,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import viewsets, generics, parsers, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from Blog.models import Post, Hashtag, Comment, Rating, User
 from Blog import serializers, paginators
 
@@ -10,9 +11,11 @@ from Blog import serializers, paginators
 # /posts/?q=
 # /posts/{id}/
 # /post/{id}/comments/ (post)
+
 class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = Post.objects.filter(active=True)
     serializer_class = serializers.PostSerializer
+    pagination_class = paginators.PostPaginator
 
     def get_serializer_class(self):
         if hasattr(self, 'kwargs') and 'pk' in self.kwargs:
@@ -21,11 +24,6 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
             return serializers.PostDetailSerializer
         else:
             return self.serializer_class
-        
-    def get_permissions(self):
-        if self.action in ['add_comment']:
-            return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]
 
     def get_queryset(self):
         query_set = self.queryset
@@ -36,31 +34,16 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
         if self.action.__eq__('retrieve'):
             query_set = Post.objects.prefetch_related('hashtags', 'user').filter(active=True)
         return query_set
-    
-    # @action(methods=['get'], url_path='comments', detail=True)
-    # def get_comment(self, request, pk):
-    #     print('get comment function')
-    #     comments = self.get_object().comment_set.order_by('-id')
-    #     paginator = paginators.CommentPaginator()
-    #     page = paginator.paginate_queryset(comments, request)
-    #     if page is not None:
-    #         serializer = serializers.CommentSerializer(page, many=True)
-    #         return paginator.get_paginated_response(serializer.data)
-        
-    #     return Response(serializers.CommentSerializer(comments, many=True).data, status=status.HTTP_200_OK)
-
-    # @action(methods=['post'], url_path='comments', detail=True)
-    # def add_comment(self, request, pk):
-    #     c = self.get_object().comment_set.create(user=request.user, content=request.data.get('content'))
-    #     return Response(serializers.CommentSerializer(c).data, status=status.HTTP_201_CREATED)
 
     @action(methods=['get', 'post'], url_path='comments', detail=True)
     def comment_handle(self, request, pk):
         if request.method.__eq__('POST'):
+            if not request.user.is_authenticated:
+                raise PermissionDenied()
             c = self.get_object().comment_set.create(user=request.user, content=request.data.get('content'))
             return Response(serializers.CommentSerializer(c).data, status=status.HTTP_201_CREATED)
         elif request.method.__eq__('GET'):
-            comments = self.get_object().comment_set.order_by('-id')
+            comments = self.get_object().comment_set.order_by('-id').filter(parent_comment__isnull=True).select_related('user')
             paginator = paginators.CommentPaginator()
             page = paginator.paginate_queryset(comments, request)
             if page is not None:
@@ -68,7 +51,12 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
                 return paginator.get_paginated_response(serializer.data)
             
             return Response(serializers.CommentSerializer(comments, many=True).data, status=status.HTTP_200_OK)
-
+        
+    @action(methods=['get'], url_path='images', detail=True)
+    def images_handle(self, request, pk):
+            images = self.get_object().images.order_by('-id')
+            return Response(serializers.ImageSerializer(images, many=True).data, status=status.HTTP_200_OK)
+        
 
 # /hashtags/
 # /hashtags/?q=
@@ -88,7 +76,7 @@ class HashtagViewSet(viewsets.ViewSet, generics.ListAPIView):
 # /users/: create user
 # /users/current-user/: (get)
 # /users/current-user/: (patch)
-class UserViewSet(viewsets.ViewSet, generics.CreateAPIView):
+class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.RetrieveAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = serializers.UserSerializer
     parser_classes = [parsers.MultiPartParser,]
@@ -98,6 +86,12 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView):
             return [permissions.IsAuthenticated()]
         else:
             return [permissions.AllowAny()]
+        
+    def get_queryset(self):
+        query_set = self.queryset
+        if self.action.__eq__('retrieve'):
+            query_set = User.objects
+        return query_set
 
     @action(methods=['get', 'patch'], url_path='current-user', detail=False)
     def current_user(self, request):
@@ -108,3 +102,38 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView):
                 user.password = make_password(request.data.get('password'))
                 user.save()
         return Response(serializers.UserSerializer(user).data)
+    
+    
+class CommentViewSet(viewsets.ViewSet, generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = serializers.CommentSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(parent_comment__isnull=True).order_by('-created_date')
+        post_id = self.request.query_params.get('postId')
+        if post_id:
+            queryset = queryset.filter(post_id=post_id, parent_comment__isnull=True).order_by('-created_date')
+        return queryset
+    
+    def get_permissions(self):
+        if self.action.__eq__('list'):
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
+
+    def delete(self, request, *args, **kwargs):
+        comment = self.get_object()
+        if comment.user == request.user:
+            comment.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+    def update(self, request, *args, **kwargs):
+        comment = self.get_object()
+        if comment.user == request.user:
+            comment.content = request.data.get('content')
+            comment.save()
+            return Response(serializers.CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)

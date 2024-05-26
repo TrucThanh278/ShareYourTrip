@@ -1,21 +1,49 @@
 from rest_framework import serializers
-from Blog.models import Post, Rating, Report, Comment, Hashtag, User
+from Blog.models import Post, Rating, Report, Comment, Hashtag, User, Image
 
 class HashtagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hashtag
         fields = ['id', 'hashtag']
 
-class PostSerializer(serializers.ModelSerializer):
-    hashtags = HashtagSerializer(many=True, read_only=True)
+class ImageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Post
-        fields = ['title', 'starting_point', 'end_point', 'hashtags']
+        model = Image
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        if instance.image:
+            rep['image'] = instance.image.url
+
+        return rep
 
 class PostUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username']
+        fields = ['id', 'first_name', 'last_name', 'avatar']
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        if instance.avatar:
+            rep['avatar'] = instance.avatar.url
+
+        return rep
+
+class PostSerializer(serializers.ModelSerializer):
+    hashtags = HashtagSerializer(many=True, read_only=True)
+    user = PostUserSerializer(read_only=True)
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'starting_point', 'end_point', 'hashtags', 'user']
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        if instance.user.avatar:
+            rep['user']['avatar'] = instance.user.avatar.url
+
+        return rep
+
 
 class PostDetailSerializer(serializers.ModelSerializer):
     hashtags = HashtagSerializer(many=True, read_only=True)
@@ -23,6 +51,13 @@ class PostDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = '__all__'
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        if instance.user.avatar:
+            rep['user']['avatar'] = instance.user.avatar.url
+
+        return rep
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -42,7 +77,23 @@ class UserSerializer(serializers.ModelSerializer):
             }
         }
 
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        if instance.avatar:
+            rep['avatar'] = instance.avatar.url
+
+        return rep
+   
+
+class RecursiveField(serializers.Serializer):
+    def to_representation(self, value):
+        serializer = self.parent.parent.__class__(value, context=self.context)
+        return serializer.data
+    
+
 class CommentSerializer(serializers.ModelSerializer):
+    replies = RecursiveField(many=True, read_only=True)
+    user = PostUserSerializer(read_only=True)
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ['id', 'content', 'confirmed', 'created_date', 'updated_date' ,'replies', 'user']

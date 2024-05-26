@@ -6,7 +6,7 @@ from ckeditor.fields import RichTextField
 
 class User(AbstractUser):
     GENDER = [
-        ('men', 'MEN'),
+        ('men', 'Men'),
         ('women', 'Women'),
         ('others', 'Others')
     ]
@@ -47,6 +47,7 @@ class Post(BaseModel):
 
 class Image(models.Model):
     image = CloudinaryField()
+    name = models.CharField(max_length=255, null=True, blank=True)
     post = models.ForeignKey(Post, related_name='images', on_delete=models.CASCADE)
 
 
@@ -68,6 +69,16 @@ class Interaction(models.Model):
 class Comment(Interaction):
     content = models.TextField(max_length=1000)
     confirmed = models.BooleanField(default=False)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    parent_comment = models.ForeignKey('self', related_name='replies', on_delete=models.CASCADE, blank=True, null=True)
+
+    class Meta:
+        ordering = ['-created_date', '-updated_date']
+        get_latest_by = ['created_date']
+
+    def __str__(self):
+        return self.content
 
 
 class Rating(Interaction):
