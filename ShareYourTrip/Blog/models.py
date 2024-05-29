@@ -15,8 +15,6 @@ class User(AbstractUser):
         ('user', 'User'),
         ('admin', 'Admin')
     ]
-
-    fullname = models.CharField(max_length=200, null=False)
     report_count = models.IntegerField(default=0)
     avatar = CloudinaryField('avatar', null=True, blank=True)
     phone_number = models.CharField(max_length=10, null=True, unique=True, blank=True)
@@ -32,9 +30,6 @@ class User(AbstractUser):
     def increase_report_count(self):
         self.report_count += 1
         self.save()
-    def __str__(self):
-        return self.fullname
-
 
 
 
@@ -47,10 +42,10 @@ class BaseModel(models.Model):
         abstract = True
 
 
-class Follow(BaseModel):
+class Follow(models.Model):
     follower = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
     following = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)
-
+    created_date = models.DateTimeField(auto_now_add=True, null=False)
     class Meta:
         unique_together = ('follower', 'following')
 
@@ -97,7 +92,6 @@ class Hashtag(BaseModel):
 class Comment(Interaction):
     content = models.TextField(max_length=1000)
     confirmed = models.BooleanField(default=False)
-    created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     parent_comment = models.ForeignKey('self', related_name='replies', on_delete=models.CASCADE, blank=True, null=True)
 
@@ -105,11 +99,15 @@ class Comment(Interaction):
         ordering = ['-created_date', '-updated_date']
         get_latest_by = ['created_date']
 
+
+
     def __str__(self):
         return self.content
 
     def __str__(self):
         return f'Comment by {self.user.username} on {self.post.title}'
+
+
 
 
 class Rating(models.Model):
