@@ -164,5 +164,5 @@ class CommentSerializer(serializers.ModelSerializer):
     user = PostUserSerializer(read_only=True)
     class Meta:
         model = Comment
-        fields = ['id', 'content', 'confirmed', 'created_date', 'updated_date', 'replies', 'user']
+        fields = ['id', 'content', 'confirmed', 'created_date', 'updated_date', 'user', 'replies']
 

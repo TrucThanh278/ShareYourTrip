@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from cloudinary.models import CloudinaryField
 from ckeditor.fields import RichTextField
-CLOUDINARY_DOMAIN = 'https://res.cloudinary.com/dsvodlq5d/'
 
 class User(AbstractUser):
     GENDER_CHOICES = [
@@ -30,6 +29,9 @@ class User(AbstractUser):
     def increase_report_count(self):
         self.report_count += 1
         self.save()
+    def __str__(self):
+        return self.first_name + ' ' + self.last_name
+
 
 
 
@@ -78,7 +80,6 @@ class Post(BaseModel):
 
 class Image(models.Model):
     image = CloudinaryField()
-    name = models.CharField(max_length=255, null=True, blank=True)
     post = models.ForeignKey(Post, related_name='images', on_delete=models.CASCADE)
 
 
@@ -102,10 +103,7 @@ class Comment(Interaction):
 
 
     def __str__(self):
-        return self.content
-
-    def __str__(self):
-        return f'Comment by {self.user.username} on {self.post.title}'
+        return f'Comment by {self.user.username} on {self.post.title} with content: {self.content}'
 
 
 

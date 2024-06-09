@@ -5,10 +5,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from Blog.models import Post, Hashtag, Comment, Rating, User, Like, Follow, Report, Group, Image
 from Blog import serializers, paginators, perms
-from Blog.perms import IsAdmin, IsUser
-from django.contrib.auth.models import Group
-from django.http import JsonResponse
-from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
 
@@ -38,7 +34,7 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
         if self.action == 'list':
             q = self.request.query_params.get('q')
             if q:
-                query_set = query_set.filter(Q(title__icontains=q) | Q(description__icontains=q))
+                query_set = query_set.filter(Q(title__icontains=q) | Q(description__icontains=q) | Q(starting_point__icontains=q) | Q(end_point__icontains=q))
         if self.action == 'retrieve':
             query_set = Post.objects.prefetch_related('hashtags', 'user').filter(active=True)
         return query_set

@@ -24,7 +24,6 @@ SECRET_KEY = 'django-insecure-&af+c18skp3-2tqa_3qhd5k!&byv4+yv&$i^33!+ro8nb02qce
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-
 ALLOWED_HOSTS = ['*']
 
 
@@ -101,9 +100,10 @@ CKEDITOR_UPLOAD_PATH = "ckeditors/images/"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'new_schema2',
+        'NAME': 'shareyourtrip',
+        #'NAME': 'new_schema2',
         'USER': 'root',
-        'PASSWORD': 'Vu0932868903',
+        'PASSWORD': 'ThanhTruc2708',
         'HOST': ''  # mặc định localhost
     }
 }
@@ -149,5 +149,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'Blog.User'
 
-CLIENT_ID = '1lPQcnFFTdpqhPrmZCpVIzgHQkP895gT1upAzj8I'
-CLIENT_SECRET = 'kd4tPlsii05VFdCkFFM9SIIT5GbOoiEI5sOPERF9bZrcYkyzyvZRpNScOb6nJqCkpzvSyZgnEgIvHSBuRQW9hAjYos1D84EXQLJr4PbbE3bc6dsF70BpeG7n9yp5j7p1'
+# Truc
+#CLIENT_ID = 'zA8iFkaeejABLUaSQ2bxytWde6Pn2HGBEgAy7bOY'
+#CLIENT_SECRET = 'vyQ5EN0XolrR0yi551eykdRSga6oj1JUsAM8QtHbFcEF97r4lCbTnt9f9vC0HpBdOhONzS2qSdzqNCHAvUzKlNcB3jWeU1Id42CbgFe0mzh880C8lljUNFGT8WjjTVvU'
+
+#Vu
+#CLIENT_ID = '1lPQcnFFTdpqhPrmZCpVIzgHQkP895gT1upAzj8I'
+#CLIENT_SECRET = 'kd4tPlsii05VFdCkFFM9SIIT5GbOoiEI5sOPERF9bZrcYkyzyvZRpNScOb6nJqCkpzvSyZgnEgIvHSBuRQW9hAjYos1D84EXQLJr4PbbE3bc6dsF70BpeG7n9yp5j7p1'
