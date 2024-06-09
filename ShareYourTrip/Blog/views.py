@@ -3,7 +3,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import viewsets, generics, parsers, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from Blog.models import Post, Hashtag, Comment, User
+from Blog.models import Post, Hashtag, Comment, Rating, User, Like, Follow, Report, Group, Image
 from Blog import serializers, paginators, perms
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
@@ -15,7 +15,7 @@ from rest_framework.exceptions import PermissionDenied
 # /posts/{id}/
 # /post/{id}/comments/ (post)
 
-class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
+class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView, generics.CreateAPIView):
     queryset = Post.objects.filter(active=True)
     serializer_class = serializers.PostSerializer
     pagination_class = paginators.PostPaginator
@@ -39,6 +39,11 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
             query_set = Post.objects.prefetch_related('hashtags', 'user').filter(active=True)
         return query_set
 
+    def perform_create(self, serializer):
+        if not self.request.user.is_authenticated:
+            raise PermissionDenied()
+        serializer.save(user=self.request.user)
+
     @action(methods=['get', 'post'], url_path='comments', detail=True)
     def comment_handle(self, request, pk):
         if request.method.__eq__('POST'):
@@ -55,15 +60,24 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
                 return paginator.get_paginated_response(serializer.data)
 
             return Response(serializers.CommentSerializer(comments, many=True).data, status=status.HTTP_200_OK)
-        
+
     @action(methods=['get'], url_path='images', detail=True)
     def images_handle(self, request, pk):
             images = self.get_object().images.order_by('-id')
             return Response(serializers.ImageSerializer(images, many=True).data, status=status.HTTP_200_OK)
 
+    @action(methods=['get'], detail=True, url_path='average_rating')
+    def average_rating(self, request, pk=None):
+        post = self.get_object()
+        ratings = post.ratings.all()  # Sử dụng related_name 'ratings'
+        if not ratings.exists():
+            return Response({'average_rating': 0}, status=status.HTTP_200_OK)
+        average = sum(rating.stars for rating in ratings) / ratings.count()  # Sử dụng 'stars'
+        return Response({'average_rating': average}, status=status.HTTP_200_OK)
+
 # /hashtags/
 # /hashtags/?q=
-class HashtagViewSet(viewsets.ViewSet, generics.ListAPIView):
+class HashtagViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView):
     queryset = Hashtag.objects.all()
     serializer_class = serializers.HashtagSerializer
 
@@ -137,3 +151,33 @@ class CommentViewSet(viewsets.ViewSet, generics.RetrieveUpdateDestroyAPIView):
             return Response(serializers.CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
+
+class GroupViewSet(viewsets.ModelViewSet, generics.CreateAPIView, generics.RetrieveAPIView):
+    queryset = Group.objects.all()
+    serializer_class = serializers.GroupSerializer
+
+class ReportViewSet(viewsets.ModelViewSet):
+    queryset = Report.objects.all()
+    serializer_class = serializers.ReportSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Ensure the user is authenticated
+
+    def perform_create(self, serializer):
+        if self.request.user.is_authenticated:
+            serializer.save(reporter=self.request.user)
+        else:
+            raise serializers.ValidationError("You must be logged in to report a user.")
+
+class FollowViewSet(viewsets.ModelViewSet):
+    queryset = Follow.objects.all()
+    serializer_class = serializers.FollowSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class ImageViewSet(viewsets.ModelViewSet):
+    queryset = Image.objects.all()
+    serializer_class = serializers.ImageSerializer
+    def perform_create(self, serializer):
+        serializer.save(post=self.request.user.post_set.first())
+
+class RatingViewSet(viewsets.ModelViewSet):
+    queryset = Rating.objects.all()
+    serializer_class = serializers.RatingSerializer

@@ -101,6 +101,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'shareyourtrip',
+        #'NAME': 'new_schema2',
         'USER': 'root',
         'PASSWORD': 'ThanhTruc2708',
         'HOST': ''  # mặc định localhost
@@ -148,5 +149,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'Blog.User'
 
-CLIENT_ID = 'zA8iFkaeejABLUaSQ2bxytWde6Pn2HGBEgAy7bOY'
-CLIENT_SECRET = 'vyQ5EN0XolrR0yi551eykdRSga6oj1JUsAM8QtHbFcEF97r4lCbTnt9f9vC0HpBdOhONzS2qSdzqNCHAvUzKlNcB3jWeU1Id42CbgFe0mzh880C8lljUNFGT8WjjTVvU'
+# Truc
+#CLIENT_ID = 'zA8iFkaeejABLUaSQ2bxytWde6Pn2HGBEgAy7bOY'
+#CLIENT_SECRET = 'vyQ5EN0XolrR0yi551eykdRSga6oj1JUsAM8QtHbFcEF97r4lCbTnt9f9vC0HpBdOhONzS2qSdzqNCHAvUzKlNcB3jWeU1Id42CbgFe0mzh880C8lljUNFGT8WjjTVvU'
+
+#Vu
+#CLIENT_ID = '1lPQcnFFTdpqhPrmZCpVIzgHQkP895gT1upAzj8I'
+#CLIENT_SECRET = 'kd4tPlsii05VFdCkFFM9SIIT5GbOoiEI5sOPERF9bZrcYkyzyvZRpNScOb6nJqCkpzvSyZgnEgIvHSBuRQW9hAjYos1D84EXQLJr4PbbE3bc6dsF70BpeG7n9yp5j7p1'
