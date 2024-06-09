@@ -112,14 +112,14 @@ class Comment(Interaction):
 
 class Rating(models.Model):
     rater = models.ForeignKey(User, related_name='given_ratings', on_delete=models.CASCADE)
-    rated_user = models.ForeignKey(User, related_name='received_ratings', on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='ratings', on_delete=models.CASCADE)
     stars = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
 
     class Meta:
-        unique_together = ('rater', 'rated_user')
+        unique_together = ('rater', 'post')
 
     def __str__(self):
-        return f'Rating: {self.stars} stars by {self.rater.username} to {self.rated_user.username}'
+        return f'Rating: {self.stars} stars by {self.rater.username} for Post ID: {self.post.id}'
 
 
 class Like(Interaction):

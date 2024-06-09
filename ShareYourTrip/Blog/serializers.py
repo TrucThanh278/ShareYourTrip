@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from Blog.models import Post, Rating, Report, Comment, Hashtag, User, Image, Group, Follow
-
+from django.db.models import Avg
 class HashtagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hashtag
@@ -30,13 +30,19 @@ class PostUserSerializer(serializers.ModelSerializer):
 
         return rep
 
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = ['id', 'rater', 'post', 'stars']
+
 class PostSerializer(serializers.ModelSerializer):
-    hashtags = HashtagSerializer(many=True, read_only=True)
+    hashtags = serializers.PrimaryKeyRelatedField(queryset=Hashtag.objects.all(), many=True)
     user = PostUserSerializer(read_only=True)
+    ratings = RatingSerializer(many=True, read_only=True)
     class Meta:
         model = Post
         fields = ['id', 'title', 'starting_point', 'end_point', 'hashtags', 'user', 'start_time', 'end_time', 'cost',
-                  'description']
+                  'description', "ratings"]
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -46,7 +52,10 @@ class PostSerializer(serializers.ModelSerializer):
         return rep
 
     def create(self, validated_data):
-        return Post.objects.create(**validated_data)
+        hashtags_data = validated_data.pop('hashtags')
+        post = Post.objects.create(**validated_data)
+        post.hashtags.set(hashtags_data)
+        return post
 
 class PostDetailSerializer(serializers.ModelSerializer):
     hashtags = HashtagSerializer(many=True, read_only=True)
@@ -137,6 +146,8 @@ class ImageSerializer(serializers.ModelSerializer):
         model = Image
         fields = ['id', 'image', 'name', 'post']
         read_only_fields = ['id', 'post']
+
+
 
 # Sử dụng lại chính serializers của cha để serialize cho các comment con
 # self.parent là serializers của lớp RecursiveField -> CommentSerializer sử dụng nó thì đó là CommentSerializers

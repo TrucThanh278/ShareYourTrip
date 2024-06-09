@@ -70,6 +70,15 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
             images = self.get_object().images.order_by('-id')
             return Response(serializers.ImageSerializer(images, many=True).data, status=status.HTTP_200_OK)
 
+    @action(methods=['get'], detail=True, url_path='average_rating')
+    def average_rating(self, request, pk=None):
+        post = self.get_object()
+        ratings = post.ratings.all()  # Sử dụng related_name 'ratings'
+        if not ratings.exists():
+            return Response({'average_rating': 0}, status=status.HTTP_200_OK)
+        average = sum(rating.stars for rating in ratings) / ratings.count()  # Sử dụng 'stars'
+        return Response({'average_rating': average}, status=status.HTTP_200_OK)
+
 # /hashtags/
 # /hashtags/?q=
 class HashtagViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView):
@@ -172,3 +181,7 @@ class ImageViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ImageSerializer
     def perform_create(self, serializer):
         serializer.save(post=self.request.user.post_set.first())
+
+class RatingViewSet(viewsets.ModelViewSet):
+    queryset = Rating.objects.all()
+    serializer_class = serializers.RatingSerializer
