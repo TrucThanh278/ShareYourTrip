@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from cloudinary.models import CloudinaryField
 from ckeditor.fields import RichTextField
-CLOUDINARY_DOMAIN = 'https://res.cloudinary.com/dsvodlq5d/'
 
 class User(AbstractUser):
     GENDER_CHOICES = [
@@ -16,7 +15,6 @@ class User(AbstractUser):
         ('admin', 'Admin')
     ]
 
-    fullname = models.CharField(max_length=200, null=False)
     report_count = models.IntegerField(default=0)
     avatar = CloudinaryField('avatar', null=True, blank=True)
     phone_number = models.CharField(max_length=10, null=True, unique=True, blank=True)
@@ -33,7 +31,7 @@ class User(AbstractUser):
         self.report_count += 1
         self.save()
     def __str__(self):
-        return self.fullname
+        return self.first_name + ' ' + self.last_name
 
 
 
@@ -105,10 +103,7 @@ class Comment(Interaction):
         get_latest_by = ['created_date']
 
     def __str__(self):
-        return self.content
-
-    def __str__(self):
-        return f'Comment by {self.user.username} on {self.post.title}'
+        return f'Comment by {self.user.username} on {self.post.title} with content: {self.content}'
 
 
 class Rating(models.Model):

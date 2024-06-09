@@ -100,9 +100,9 @@ CKEDITOR_UPLOAD_PATH = "ckeditors/images/"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'new_schema',
+        'NAME': 'shareyourtrip',
         'USER': 'root',
-        'PASSWORD': 'Vu0932868903',
+        'PASSWORD': 'ThanhTruc2708',
         'HOST': ''  # mặc định localhost
     }
 }
@@ -148,5 +148,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'Blog.User'
 
-CLIENT_ID = 'dfh7uWp5VKdf4q18a8jLtLTHZAfGhasLBb6mN9Qe'
-CLIENT_SECRET = 'Dkagq9SorkT1pG3VNL42GxAKpLRTsLS1x9gmmlranSlv58h5XdsPhJRUyYHQfDndZplRdzxqEzFuADV497hQvVPUpBczcsHgjIExow2ho1yz3IIE4HgIbuLBVO2P3xgX'
+CLIENT_ID = 'zA8iFkaeejABLUaSQ2bxytWde6Pn2HGBEgAy7bOY'
+CLIENT_SECRET = 'vyQ5EN0XolrR0yi551eykdRSga6oj1JUsAM8QtHbFcEF97r4lCbTnt9f9vC0HpBdOhONzS2qSdzqNCHAvUzKlNcB3jWeU1Id42CbgFe0mzh880C8lljUNFGT8WjjTVvU'
