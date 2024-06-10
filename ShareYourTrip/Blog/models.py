@@ -107,11 +107,10 @@ class Comment(Interaction):
 
 
 
-
 class Rating(models.Model):
     rater = models.ForeignKey(User, related_name='given_ratings', on_delete=models.CASCADE)
     post = models.ForeignKey(Post, related_name='ratings', on_delete=models.CASCADE)
-    stars = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    stars = models.IntegerField(choices=[(i, i) for i in range(1, 6)], null=True, default=1)
 
     class Meta:
         unique_together = ('rater', 'post')
@@ -146,5 +145,3 @@ class Report(models.Model):
 
     class Meta:
         unique_together = ('reporter', 'reported_user')
-
-

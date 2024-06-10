@@ -36,13 +36,13 @@ class RatingSerializer(serializers.ModelSerializer):
         fields = ['id', 'rater', 'post', 'stars']
 
 class PostSerializer(serializers.ModelSerializer):
-    hashtags = serializers.PrimaryKeyRelatedField(queryset=Hashtag.objects.all(), many=True)
+    hashtags = HashtagSerializer(many=True, read_only=True)
     user = PostUserSerializer(read_only=True)
     ratings = RatingSerializer(many=True, read_only=True)
     class Meta:
         model = Post
         fields = ['id', 'title', 'starting_point', 'end_point', 'hashtags', 'user', 'start_time', 'end_time', 'cost',
-                  'description', "ratings"]
+                  'description', 'ratings']
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -144,8 +144,15 @@ class FollowSerializer(serializers.ModelSerializer):
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ['id', 'image', 'name', 'post']
+        fields = ['id', 'image', 'post']
         read_only_fields = ['id', 'post']
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        if instance.image:
+            rep['image'] = instance.image.url
+
+        return rep
 
 
 
