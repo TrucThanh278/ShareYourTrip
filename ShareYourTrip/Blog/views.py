@@ -8,7 +8,22 @@ from Blog import serializers, paginators, perms
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
 
+from rest_framework.decorators import api_view
+from rest_framework import status
+from oauth2_provider.models import AccessToken
 
+
+@api_view(['DELETE'])
+def logout(request):
+    try:
+        token = request.headers.get('Authorization').split(' ')[1]
+        access_token = AccessToken.objects.get(token=token)
+        access_token.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except AccessToken.DoesNotExist:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # /posts/
 # /posts/?q=
@@ -176,8 +191,38 @@ class ImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
     serializer_class = serializers.ImageSerializer
     def perform_create(self, serializer):
-        serializer.save(post=self.request.user.post_set.first())
+        # serializer.save(post=self.request.user.post_set.first())
+        postId = self.request.data.get('post')  # Lấy postId từ yêu cầu POST
+        post = get_object_or_404(Post, pk=postId)  # Lấy post từ cơ sở dữ liệu
+        serializer.save(post=post)  # Gán post cho ảnh
 
 class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     serializer_class = serializers.RatingSerializer
+
+    def create(self, request, *args, **kwargs):
+        rater = request.user  # Người dùng đang rating
+        post_id = request.data.get('post')
+        stars = request.data.get('stars')
+
+        try:
+            # Lấy thông tin về bài đăng được rating
+            post = Post.objects.get(pk=post_id)
+
+            # Xác định các nhóm được phép rating bài đăng
+            allowed_groups = Group.objects.filter(post=post)
+
+            # Kiểm tra xem người dùng có thuộc bất kỳ nhóm nào được phép rating không
+            is_allowed_to_rate = any(group.members.filter(id=rater.id).exists() for group in allowed_groups)
+
+            # Nếu người dùng không thuộc bất kỳ nhóm nào được phép rating, trả về lỗi
+            if not is_allowed_to_rate:
+                return Response({'error': 'You are not allowed to rate this post'}, status=status.HTTP_403_FORBIDDEN)
+
+            # Tạo rating cho bài đăng
+            Rating.objects.create(rater=rater, post=post, stars=stars)
+
+            return Response({'message': 'Rating created successfully'}, status=status.HTTP_201_CREATED)
+
+        except Post.DoesNotExist:
+            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
