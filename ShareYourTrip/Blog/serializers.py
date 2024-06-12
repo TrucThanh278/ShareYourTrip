@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from Blog.models import Post, Rating, Report, Comment, Hashtag, User, Image, Group, Follow
 from django.db.models import Avg
+
+
 class HashtagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hashtag
@@ -19,9 +21,10 @@ class ImageSerializer(serializers.ModelSerializer):
         return rep
 
 class PostUserSerializer(serializers.ModelSerializer):
+    followers = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'avatar']
+        fields = ['id', 'first_name', 'last_name', 'avatar', 'followers']
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -29,6 +32,8 @@ class PostUserSerializer(serializers.ModelSerializer):
             rep['avatar'] = instance.avatar.url
 
         return rep
+    def get_followers(self, obj):
+        return obj.followers.count()
 
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,12 +41,14 @@ class RatingSerializer(serializers.ModelSerializer):
         fields = ['id', 'rater', 'post', 'stars']
 
 class PostSerializer(serializers.ModelSerializer):
-    hashtags = HashtagSerializer(many=True, read_only=True)
+    hashtags = serializers.PrimaryKeyRelatedField(many=True, queryset=Hashtag.objects.all())
+    hashtags_read = HashtagSerializer(many=True, read_only=True, source='hashtags')
     user = PostUserSerializer(read_only=True)
     ratings = RatingSerializer(many=True, read_only=True)
     class Meta:
         model = Post
-        fields = ['id', 'title', 'starting_point', 'end_point', 'hashtags', 'user', 'start_time', 'end_time', 'cost',
+        fields = ['id', 'title', 'starting_point', 'end_point', 'hashtags',
+                  'hashtags_read', 'user', 'start_time', 'end_time', 'cost',
                   'description', 'ratings']
 
     def to_representation(self, instance):

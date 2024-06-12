@@ -5,25 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d71f00ed-96ac-4fec-8136-6474632a4e37" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/ShareYourTrip/Blog/admin.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ShareYourTrip/Blog/serializers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ShareYourTrip/Blog/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ShareYourTrip/Blog/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/BaiTapCuoiKi.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BaiTapCuoiKi.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ShareYourTrip/App/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShareYourTrip/Blog/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ShareYourTrip/App/admin.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ShareYourTrip/App/apps.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShareYourTrip/Blog/apps.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ShareYourTrip/App/migrations/0001_initial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ShareYourTrip/App/migrations/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShareYourTrip/Blog/migrations/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ShareYourTrip/App/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShareYourTrip/Blog/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ShareYourTrip/App/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShareYourTrip/Blog/tests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ShareYourTrip/App/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/ShareYourTrip.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ShareYourTrip.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ShareYourTrip/Blog/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ShareYourTrip/Blog/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShareYourTrip/Blog/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ShareYourTrip/Blog/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShareYourTrip/Blog/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ShareYourTrip/Blog/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShareYourTrip/Blog/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ShareYourTrip/ShareYourTrip/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShareYourTrip/ShareYourTrip/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ShareYourTrip/ShareYourTrip/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/ShareYourTrip/ShareYourTrip/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ShareYourTrip/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ShareYourTrip/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,9 +48,9 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;new29&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;temp9&quot;,
     &quot;last_opened_file_path&quot;: &quot;D:/Trip/ShareYourTrip&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
   <component name="SharedIndexes">

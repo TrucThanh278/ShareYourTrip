@@ -13,6 +13,8 @@ r.register('follow', views.FollowViewSet, 'follow')
 r.register('images', views.ImageViewSet, 'images')
 r.register('rating', views.RatingViewSet, 'rating')
 
+
 urlpatterns = [
     path('', include(r.urls)),
+    path('api/logout', views.logout, name='logout'),
 ]
