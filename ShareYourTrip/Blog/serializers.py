@@ -65,11 +65,18 @@ class PostSerializer(serializers.ModelSerializer):
         return post
 
 class PostDetailSerializer(serializers.ModelSerializer):
-    hashtags = HashtagSerializer(many=True, read_only=True)
+    hashtags = serializers.PrimaryKeyRelatedField(many=True, queryset=Hashtag.objects.all())
+    hashtags_read = HashtagSerializer(many=True, read_only=True, source='hashtags')
     user = PostUserSerializer(read_only=True)
     class Meta:
         model = Post
         fields = '__all__'
+
+    def create(self, validated_data):
+        hashtags_data = validated_data.pop('hashtags')
+        post = Post.objects.create(**validated_data)
+        post.hashtags.set(hashtags_data)
+        return post
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
