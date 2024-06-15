@@ -59,7 +59,7 @@ class PostSerializer(serializers.ModelSerializer):
         return rep
 
     def create(self, validated_data):
-        hashtags_data = validated_data.pop('hashtags')
+        hashtags_data = validated_data.pop('hashtags',[])
         post = Post.objects.create(**validated_data)
         post.hashtags.set(hashtags_data)
         return post
@@ -103,7 +103,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'password', 'first_name', 'last_name', 'email', 'phone_number', 'gender', 'avatar',
-                  'address', 'date_of_birth', 'reported_user', 'reporter', 'following', 'followers']
+                  'address', 'date_of_birth', 'reported_user', 'reporter', 'following', 'followers', 'role']
         extra_kwargs = {
             'password': {
                 'write_only': True
@@ -135,11 +135,12 @@ class GroupSerializer(serializers.ModelSerializer):
 
 class ReportSerializer(serializers.ModelSerializer):
     reported_user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    reported_user_username = serializers.ReadOnlyField(source='reported_user.username')
     reporter = serializers.ReadOnlyField(source='reporter.username')
 
     class Meta:
         model = Report
-        fields = ['id', 'created_date', 'content', 'reported_user', 'reporter']
+        fields = ['id', 'created_date', 'content', 'reported_user', 'reported_user_username', 'reporter']
 
     def validate(self, data):
         if self.context['request'].user == data['reported_user']:

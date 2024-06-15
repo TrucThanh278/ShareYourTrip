@@ -131,8 +131,15 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.RetrieveAPI
                 user.password = make_password(request.data.get('password'))
                 user.save()
         return Response(serializers.UserSerializer(user).data)
-    
-    
+
+    @action(methods=['post'], detail=True)
+    def block_user(self, request, pk=None):
+        user = self.get_object()
+        user.is_active = False
+        user.save()
+        return Response({'message': 'User blocked successfully'})
+
+
 class CommentViewSet(viewsets.ViewSet, generics.RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = serializers.CommentSerializer
@@ -171,7 +178,7 @@ class GroupViewSet(viewsets.ModelViewSet, generics.CreateAPIView, generics.Retri
     queryset = Group.objects.all()
     serializer_class = serializers.GroupSerializer
 
-class ReportViewSet(viewsets.ModelViewSet):
+class ReportViewSet(viewsets.ViewSet,generics.CreateAPIView, generics.ListAPIView):
     queryset = Report.objects.all()
     serializer_class = serializers.ReportSerializer
     permission_classes = [permissions.IsAuthenticated]  # Ensure the user is authenticated
@@ -182,12 +189,12 @@ class ReportViewSet(viewsets.ModelViewSet):
         else:
             raise serializers.ValidationError("You must be logged in to report a user.")
 
-class FollowViewSet(viewsets.ModelViewSet):
+class FollowViewSet(viewsets.ViewSet,generics.CreateAPIView, generics.ListAPIView):
     queryset = Follow.objects.all()
     serializer_class = serializers.FollowSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-class ImageViewSet(viewsets.ModelViewSet):
+class ImageViewSet(viewsets.ViewSet,generics.CreateAPIView, generics.ListAPIView):
     queryset = Image.objects.all()
     serializer_class = serializers.ImageSerializer
     def perform_create(self, serializer):
@@ -196,7 +203,7 @@ class ImageViewSet(viewsets.ModelViewSet):
         post = get_object_or_404(Post, pk=postId)  # Lấy post từ cơ sở dữ liệu
         serializer.save(post=post)  # Gán post cho ảnh
 
-class RatingViewSet(viewsets.ModelViewSet):
+class RatingViewSet(viewsets.ViewSet,generics.CreateAPIView, generics.ListAPIView):
     queryset = Rating.objects.all()
     serializer_class = serializers.RatingSerializer
 
