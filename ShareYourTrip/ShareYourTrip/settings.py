@@ -100,9 +100,9 @@ CKEDITOR_UPLOAD_PATH = "ckeditors/images/"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'new_schema',
+        'NAME': 'shareyourtrip',
         'USER': 'root',
-        'PASSWORD': 'Vu0932868903',
+        'PASSWORD': 'ThanhTruc2708',
         'HOST': ''  # mặc định localhost
     }
 }
