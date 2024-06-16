@@ -100,9 +100,10 @@ CKEDITOR_UPLOAD_PATH = "ckeditors/images/"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'new_schema',
+        'NAME': 'shareyourtrip',
+        # 'NAME': 'new_schema4',
         'USER': 'root',
-        'PASSWORD': 'Vu0932868903',
+        'PASSWORD': 'ThanhTruc2708',
         'HOST': ''  # mặc định localhost
     }
 }
@@ -148,5 +149,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'Blog.User'
 
-CLIENT_ID = 'dfh7uWp5VKdf4q18a8jLtLTHZAfGhasLBb6mN9Qe'
-CLIENT_SECRET = 'Dkagq9SorkT1pG3VNL42GxAKpLRTsLS1x9gmmlranSlv58h5XdsPhJRUyYHQfDndZplRdzxqEzFuADV497hQvVPUpBczcsHgjIExow2ho1yz3IIE4HgIbuLBVO2P3xgX'
+# Truc
+CLIENT_ID = 'NBGY8GOxJnOewQJ05es21wSOz9P8Y5ifyOwoJ5rZ'
+CLIENT_SECRET = 'jM9xMKCjF4LI0X70URB7ZA1R0dt1MPN4dS1CY9By4nys7lReFEktiGHNOwoQbnjKdnlI2oeCuxaYUgTxsAbvwdS2TdYIfUuMZ6OXc4tnf4touVtfICIync6GkD67KZpp'
+
+#Vu
+#CLIENT_ID = '1lPQcnFFTdpqhPrmZCpVIzgHQkP895gT1upAzj8I'
+#CLIENT_SECRET = 'kd4tPlsii05VFdCkFFM9SIIT5GbOoiEI5sOPERF9bZrcYkyzyvZRpNScOb6nJqCkpzvSyZgnEgIvHSBuRQW9hAjYos1D84EXQLJr4PbbE3bc6dsF70BpeG7n9yp5j7p1'
+
