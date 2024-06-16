@@ -182,9 +182,10 @@ class RecursiveField(serializers.Serializer):
     
 
 class CommentSerializer(serializers.ModelSerializer):
-    replies = RecursiveField(many=True, read_only=True)
+    replies = RecursiveField(many=True)
     user = PostUserSerializer(read_only=True)
+    parent_comment = serializers.PrimaryKeyRelatedField(queryset=Comment.objects.all(), allow_null=True, required=False)
     class Meta:
         model = Comment
-        fields = ['id', 'content', 'confirmed', 'created_date', 'updated_date', 'user', 'replies']
+        fields = ['id', 'content', 'confirmed', 'created_date', 'updated_date', 'user', 'replies', 'parent_comment']
 

@@ -7,10 +7,11 @@ from Blog.models import Post, Hashtag, Comment, Rating, User, Like, Follow, Repo
 from Blog import serializers, paginators, perms
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
-
 from rest_framework.decorators import api_view
 from rest_framework import status
 from oauth2_provider.models import AccessToken
+from Blog.serializers import CommentSerializer
+
 
 
 @api_view(['DELETE'])
@@ -64,8 +65,22 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
         if request.method.__eq__('POST'):
             if not request.user.is_authenticated:
                 raise PermissionDenied()
-            c = self.get_object().comment_set.create(user=request.user, content=request.data.get('content'))
-            return Response(serializers.CommentSerializer(c).data, status=status.HTTP_201_CREATED)
+            content = request.data.get('content')
+            parent_comment_id = request.data.get('parent_comment')
+            parent_comment = None
+            if parent_comment_id:
+                try:
+                    parent_comment = Comment.objects.get(id=parent_comment_id)
+                except Comment.DoesNotExist:
+                    return Response({"detail": "Parent comment not found."}, status=status.HTTP_400_BAD_REQUEST)
+            # Tạo comment mới với các thuộc tính cần thiết
+            comment = Comment.objects.create(
+                user=request.user,
+                post=self.get_object(),
+                content=content,
+                parent_comment=parent_comment
+            )
+            return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
         elif request.method.__eq__('GET'):
             comments = self.get_object().comment_set.order_by('-id').filter(parent_comment__isnull=True).select_related('user')
             paginator = paginators.CommentPaginator()
@@ -173,6 +188,7 @@ class CommentViewSet(viewsets.ViewSet, generics.RetrieveUpdateDestroyAPIView):
             return Response(serializers.CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
+
 
 class GroupViewSet(viewsets.ModelViewSet, generics.CreateAPIView, generics.RetrieveAPIView):
     queryset = Group.objects.all()
