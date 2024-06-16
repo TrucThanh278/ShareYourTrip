@@ -8,6 +8,7 @@ class HashtagSerializer(serializers.ModelSerializer):
         model = Hashtag
         fields = ['id', 'hashtag']
 
+
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
@@ -20,8 +21,10 @@ class ImageSerializer(serializers.ModelSerializer):
 
         return rep
 
+
 class PostUserSerializer(serializers.ModelSerializer):
     followers = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'avatar', 'followers']
@@ -32,19 +35,23 @@ class PostUserSerializer(serializers.ModelSerializer):
             rep['avatar'] = instance.avatar.url
 
         return rep
+
     def get_followers(self, obj):
         return obj.followers.count()
+
 
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = ['id', 'rater', 'post', 'stars']
 
+
 class PostSerializer(serializers.ModelSerializer):
     hashtags = serializers.PrimaryKeyRelatedField(many=True, queryset=Hashtag.objects.all())
     hashtags_read = HashtagSerializer(many=True, read_only=True, source='hashtags')
     user = PostUserSerializer(read_only=True)
     ratings = RatingSerializer(many=True, read_only=True)
+
     class Meta:
         model = Post
         fields = ['id', 'title', 'starting_point', 'end_point', 'hashtags',
@@ -59,17 +66,26 @@ class PostSerializer(serializers.ModelSerializer):
         return rep
 
     def create(self, validated_data):
-        hashtags_data = validated_data.pop('hashtags',[])
+        hashtags_data = validated_data.pop('hashtags', [])
         post = Post.objects.create(**validated_data)
         post.hashtags.set(hashtags_data)
         return post
 
+
 class PostDetailSerializer(serializers.ModelSerializer):
-    hashtags = HashtagSerializer(many=True, read_only=True)
+    hashtags = serializers.PrimaryKeyRelatedField(many=True, queryset=Hashtag.objects.all())
+    hashtags_read = HashtagSerializer(many=True, read_only=True, source='hashtags')
     user = PostUserSerializer(read_only=True)
+
     class Meta:
         model = Post
         fields = '__all__'
+
+    def create(self, validated_data):
+        hashtags_data = validated_data.pop('hashtags')
+        post = Post.objects.create(**validated_data)
+        post.hashtags.set(hashtags_data)
+        return post
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -77,6 +93,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
             rep['user']['avatar'] = instance.user.avatar.url
 
         return rep
+
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -121,10 +138,12 @@ class UserSerializer(serializers.ModelSerializer):
             rep['avatar'] = instance.avatar.url
         return rep
 
+
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = '__all__'
+
 
 class ReportSerializer(serializers.ModelSerializer):
     reported_user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
@@ -139,6 +158,7 @@ class ReportSerializer(serializers.ModelSerializer):
         if self.context['request'].user == data['reported_user']:
             raise serializers.ValidationError("You cannot report yourself.")
         return data
+
 
 class FollowSerializer(serializers.ModelSerializer):
     follower_id = serializers.PrimaryKeyRelatedField(source='follower', queryset=User.objects.all())
@@ -163,7 +183,6 @@ class ImageSerializer(serializers.ModelSerializer):
         return rep
 
 
-
 # Sử dụng lại chính serializers của cha để serialize cho các comment con
 # self.parent là serializers của lớp RecursiveField -> CommentSerializer sử dụng nó thì đó là CommentSerializers
 # context: là 1 dict chứa các thông tin cần thiết trong qtrinh serialization: request, view, parameter,... -> đảm bảo dữ liệu cần thiết được truyền đúng cách từ serializer cha xuống con
@@ -172,12 +191,13 @@ class RecursiveField(serializers.Serializer):
     def to_representation(self, value):
         serializer = self.parent.parent.__class__(value, context=self.context)
         return serializer.data
-    
+
 
 class CommentSerializer(serializers.ModelSerializer):
-    replies = RecursiveField(many=True, read_only=True)
+    replies = RecursiveField(many=True)
     user = PostUserSerializer(read_only=True)
+    parent_comment = serializers.PrimaryKeyRelatedField(queryset=Comment.objects.all(), allow_null=True, required=False)
+
     class Meta:
         model = Comment
-        fields = ['id', 'content', 'confirmed', 'created_date', 'updated_date', 'user', 'replies']
-
+        fields = ['id', 'content', 'confirmed', 'created_date', 'updated_date', 'user', 'replies', 'parent_comment']
