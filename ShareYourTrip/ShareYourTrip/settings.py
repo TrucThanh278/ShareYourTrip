@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,10 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&af+c18skp3-2tqa_3qhd5k!&byv4+yv&$i^33!+ro8nb02qce'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
@@ -47,9 +51,9 @@ INSTALLED_APPS = [
 import cloudinary
 
 cloudinary.config(
-    cloud_name="dsvodlq5d",
-    api_key="325257939927122",
-    api_secret="hFaOAX00E9c-TzAH66vU80htg1w"
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET')
 )
 
 REST_FRAMEWORK = {
@@ -100,11 +104,10 @@ CKEDITOR_UPLOAD_PATH = "ckeditors/images/"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'shareyourtrip',
-        # 'NAME': 'new_schema4',
-        'USER': 'root',
-        'PASSWORD': 'ThanhTruc2708',
-        'HOST': ''  # mặc định localhost
+        'NAME': os.getenv('DATABASE_NAME'),
+        'USER': os.getenv('DATABASE_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+        'HOST': os.getenv('DATABASE_HOST', 'localhost')
     }
 }
 
@@ -150,8 +153,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'Blog.User'
 
 # Truc
-CLIENT_ID = 'NBGY8GOxJnOewQJ05es21wSOz9P8Y5ifyOwoJ5rZ'
-CLIENT_SECRET = 'jM9xMKCjF4LI0X70URB7ZA1R0dt1MPN4dS1CY9By4nys7lReFEktiGHNOwoQbnjKdnlI2oeCuxaYUgTxsAbvwdS2TdYIfUuMZ6OXc4tnf4touVtfICIync6GkD67KZpp'
+CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 
 #Vu
 #CLIENT_ID = '1lPQcnFFTdpqhPrmZCpVIzgHQkP895gT1upAzj8I'

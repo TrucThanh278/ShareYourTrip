@@ -173,7 +173,8 @@ class ImageSerializer(serializers.ModelSerializer):
 
 # Sử dụng lại chính serializers của cha để serialize cho các comment con
 # self.parent là serializers của lớp RecursiveField -> CommentSerializer sử dụng nó thì đó là CommentSerializers
-# context: là 1 dict chứa các thông tin cần thiết trong qtrinh serialization: request, view, parameter,... -> đảm bảo dữ liệu cần thiết được truyền đúng cách từ serializer cha xuống con
+# context: là 1 dict chứa các thông tin cần thiết trong qtrinh serialization: request, view, parameter,...
+#           -> đảm bảo dữ liệu cần thiết được truyền đúng cách từ serializer cha xuống con
 
 class RecursiveField(serializers.Serializer):
     def to_representation(self, value):
